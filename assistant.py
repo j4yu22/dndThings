@@ -2,6 +2,9 @@
 To do:
 add a 'roll' command with a refactored dice roller
 get a daemon thread for a tkinter GUI dashboard
+get something to scrape spells from wikidot and give descriptions
+add ability to calculate saving throws and automatically roll them
+add level - pb dictionary
 """
 
 import gspread
@@ -9,6 +12,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 import tkinter as tk
 from tkinter import ttk
 import re
+
 
 class Character:
     def __init__(self, nickname, name, level, max_health, current_health, temp_hp, martial_ability, spell_casting_ability, weapon_bonus, spell_focus_bonus, str_score, dex_score, con_score, int_score, wis_score, cha_score, saving_throws, crit_roll, initiative):
