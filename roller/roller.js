@@ -79,24 +79,30 @@ function updatePageWidths() {
 
 function updateSelector() {
     const visiblePages = getVisiblePageCount();
-    const percent = 100 / 3; // fixed 3-segment indicator
-    const indicatorWidth = (visiblePages / 3) * 100;
-    const offset = percent * currentPage;
+    const percentPerTab = 100 / 3; // 3 tabs
+    const visibleSpan = (visiblePages / 3) * 100;
+    const maxPage = 3 - visiblePages;
 
-    selector.style.width = `${indicatorWidth}%`;
+    const clampedPage = Math.min(currentPage, maxPage); // avoid sliding beyond edge
+    const offset = clampedPage * percentPerTab;
+
+    selector.style.width = `${visibleSpan}%`;
     selector.style.transform = `translateX(${offset}%)`;
 }
 
 function scrollToPage(index) {
     const visiblePages = getVisiblePageCount();
+    const maxPage = 3 - visiblePages;
+    currentPage = Math.max(0, Math.min(index, maxPage));
+
     const pageWidth = pagesWrapper.offsetWidth / visiblePages;
     pagesWrapper.scrollTo({
-        left: index * pageWidth,
+        left: currentPage * pageWidth,
         behavior: 'smooth'
     });
-    currentPage = index;
     updateSelector();
 }
+
 
 options.forEach(option => {
     option.addEventListener('click', () => {
