@@ -36,6 +36,7 @@ body {
     flex-direction: column;
     align-items: center;
     position: relative;
+    padding-bottom:30px;
 }
 
 .dice-counter {
@@ -78,7 +79,7 @@ body {
     -webkit-overflow-scrolling: touch;
     width: 100%;
     max-width: 1600px; /* was 1000px */
-    margin: 40px auto 0;
+    margin: 0;
     border-top: 1px solid #333;
 }
 
@@ -189,4 +190,100 @@ body {
     border-radius: 6px;
     font-family: monospace;
     z-index: 1000;
+}
+
+/* Custom die adjustments */
+.dice-wrapper.custom {
+    position: relative;
+}
+
+/* Move the counter above the die, centered */
+.dice-wrapper.custom .dice-counter {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.85em;
+    color: white;
+}
+
+/* Input tweaks: small, dark, low profile */
+.custom-input {
+    margin-top: 4px;
+    width: 48px;
+    height: 24px;
+    background-color: #222;
+    color: #fff;
+    border: 1px solid #444;
+    border-radius: 4px;
+    text-align: center;
+    font-size: 0.75em;
+    padding: 2px 4px;
+}
+
+/* Center the floating label (number or ?) */
+.custom-die-container {
+    position: relative;
+    display: inline-block;
+    width: 80px;
+    height: 80px;
+}
+
+.custom-die-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.custom-die-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1em;
+    color: black;
+    font-weight: bold;
+    pointer-events: none;
+}
+
+/* Hide number input spinners in most browsers */
+
+/* Chrome, Safari, Edge, Opera */
+.custom-input::-webkit-outer-spin-button,
+.custom-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+/* Firefox */
+.custom-input[type=number] {
+    -moz-appearance: textfield;
+}
+
+.input-container {
+    display: flex;
+    align-items: stretch;       /* stretch both to equal height */
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+#rollButton {
+    background-color: #2ecc71;
+    color: #111;
+    font-weight: bold;
+    border: none;
+    padding: 17px 24px;
+    border-radius: 8px;
+    font-size: 1.05em;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    margin-left: 12px;
+    line-height: 1;              /* fixes baseline misalignment */
+    display: flex;
+    align-items: center;         /* vertical centering of text */
+    height: 100%;                /* match input-box height */
+}
+
+#rollButton:hover {
+    background-color: #27ae60;
 }

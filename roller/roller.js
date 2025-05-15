@@ -13,10 +13,19 @@ const inputBox = document.getElementById('inputBox');
 function updateInputBox() {
     const parts = [];
 
+    // Standard dice
     for (const die of diceTypes) {
         const count = counts[die];
         if (count > 0) {
             parts.push(`${count}d${die.slice(1)}`);
+        }
+    }
+
+    // Custom die
+    if (counts["custom"] > 0) {
+        const sides = parseInt(customSidesInput.value);
+        if (!isNaN(sides) && sides > 0) {
+            parts.push(`${counts["custom"]}d${sides}`);
         }
     }
 
@@ -161,3 +170,48 @@ Page Width: ${pageWidth}px | Visible Pages: ${visiblePages}
 
 window.addEventListener('resize', updateDebugInfo);
 window.addEventListener('DOMContentLoaded', updateDebugInfo);
+
+// Register the custom die in the dice count object
+counts["custom"] = 0;
+
+// Get DOM elements
+const customButton = document.getElementById("custom");
+const customCounter = document.getElementById("custom-count");
+const customSidesInput = document.getElementById("custom-sides");
+const customLabel = document.getElementById("custom-label");
+
+// Handle left-click to increment count
+customButton.addEventListener("click", () => {
+    counts["custom"]++;
+    customCounter.textContent = counts["custom"];
+    updateInputBox();
+});
+
+// Handle right-click to decrement count
+customButton.addEventListener("contextmenu", (e) => {
+    e.preventDefault();
+    if (counts["custom"] > 0) {
+        counts["custom"]--;
+        customCounter.textContent = counts["custom"];
+        updateInputBox();
+    }
+});
+
+// Update the ? label with the number from the input box
+customSidesInput.addEventListener("input", () => {
+    const sides = parseInt(customSidesInput.value);
+    if (!isNaN(sides) && sides > 0) {
+        customLabel.textContent = sides;
+    } else {
+        customLabel.textContent = "?";
+    }
+    updateInputBox();
+});
+
+//DICE ROLL LOGIC
+const rollButton = document.getElementById("rollButton");
+
+rollButton.addEventListener("click", () => {
+    // Placeholder: log or display roll results
+    console.log("Rolling dice...");
+});

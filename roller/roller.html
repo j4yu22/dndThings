@@ -9,8 +9,10 @@
 <body>
     <div class="main-wrapper">
         <div class="roller-wrapper">
-            <div class="input-box" id="inputBox">Click dice to start rolling...</div>
-
+            <div class="input-container">
+                <div class="input-box" id="inputBox">Click dice to start rolling...</div>
+                <button id="rollButton">Roll</button>
+            </div>
             <div class="dice-container">
                 <div class="dice-wrapper">
                     <div class="dice-counter" id="d20-count">0</div>
@@ -35,6 +37,16 @@
                 <div class="dice-wrapper">
                     <div class="dice-counter" id="d4-count">0</div>
                     <button class="dice-button" id="d4"><img src="images/d4_color.png" alt="D4"></button>
+                </div>
+                <div class="dice-wrapper">
+                    <div class="dice-counter" id="custom-count">0</div>
+                    <button class="dice-button" id="custom">
+                        <div class="custom-die-container">
+                            <img src="images/custom_die.png" alt="Custom" class="custom-die-image">
+                        <span class="custom-die-label" id="custom-label">?</span>
+                        </div>
+                    </button>
+                    <input type="number" id="custom-sides" value="" min="1" max="9999999999" placeholder="sides" class="custom-input">
                 </div>
             </div>
         </div>
