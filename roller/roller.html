@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dice Roller</title>
+    <link rel="stylesheet" href="roller.css">
+</head>
+<body>
+    <div class="main-wrapper">
+        <div class="roller-wrapper">
+            <div class="input-box" id="inputBox">Click dice to start rolling...</div>
+
+            <div class="dice-container">
+                <div class="dice-wrapper">
+                    <div class="dice-counter" id="d20-count">0</div>
+                    <button class="dice-button" id="d20"><img src="images/d20_color.png" alt="D20"></button>
+                </div>
+                <div class="dice-wrapper">
+                    <div class="dice-counter" id="d12-count">0</div>
+                    <button class="dice-button" id="d12"><img src="images/d12_color.png" alt="D12"></button>
+                </div>
+                <div class="dice-wrapper">
+                    <div class="dice-counter" id="d10-count">0</div>
+                    <button class="dice-button" id="d10"><img src="images/d10_color.png" alt="D10"></button>
+                </div>
+                <div class="dice-wrapper">
+                    <div class="dice-counter" id="d8-count">0</div>
+                    <button class="dice-button" id="d8"><img src="images/d8_color.png" alt="D8"></button>
+                </div>
+                <div class="dice-wrapper">
+                    <div class="dice-counter" id="d6-count">0</div>
+                    <button class="dice-button" id="d6"><img src="images/d6_color.png" alt="D6"></button>
+                </div>
+                <div class="dice-wrapper">
+                    <div class="dice-counter" id="d4-count">0</div>
+                    <button class="dice-button" id="d4"><img src="images/d4_color.png" alt="D4"></button>
+                </div>
+            </div>
+        </div>
+        <div class="page-selector">
+            <div class="selector-option" data-index="0">Modifiers</div>
+            <div class="selector-option" data-index="1">Saved Rolls</div>
+            <div class="selector-option" data-index="2">Roll History</div>
+            <div class="selector-indicator" id="selectorIndicator"></div>
+        </div>
+        <div class="pages-wrapper">
+            <div class="page" id="modifiers-page">
+                <h2>Modifiers</h2>
+                <div class="modifiers-grid" id="modifiersGrid">
+                    <button class="modifier-button" data-mod="advantage">Advantage</button>
+                    <button class="modifier-button" data-mod="disadvantage">Disadvantage</button>
+                    <button class="modifier-button" data-mod="gwm">Great Weapon Fighting</button>
+                    <button class="modifier-button" data-mod="elven">Advantage: Elven Accuracy</button>
+                    <button class="modifier-button" data-mod="elemental">Elemental Adept</button>
+                    <button class="modifier-button" data-mod="savage">Savage Attacker</button>
+                    <button class="modifier-button" data-mod="reliable">Reliable Talent</button>
+                    <button class="modifier-button" data-mod="healer">Healer</button>
+                    <button class="modifier-button" data-mod="piercer">Piercer</button>
+                    <button class="modifier-button" data-mod="dragon">Starry Form: Dragon</button>
+                    <button class="modifier-button" data-mod="trance">Trance of Order</button>
+                    <button class="modifier-button" data-mod="tavern">Tavern Brawler</button>
+                </div>
+            </div>
+            <div class="page" id="saved-page">
+                <h2>Saved Rolls</h2>
+            </div>
+            <div class="page" id="history-page">
+                <h2>Roll History</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <div id="debugInfo" class="debug-info"></div>
+
+    <script src="roller.js"></script>
+</body>
+
+</html>
