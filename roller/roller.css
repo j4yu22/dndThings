@@ -73,7 +73,7 @@ body {
 .pages-wrapper {
     display: flex;
     flex-direction: row;
-    overflow-x: auto;
+    overflow-x: hidden;
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
     width: 100%;
@@ -162,16 +162,16 @@ body {
     flex: 1;
     text-align: center;
     line-height: 40px;
-    color: #aaa;
+    color: white; /* changed from #aaa */
     cursor: pointer;
     z-index: 1;
+    user-select: none;
 }
 
 .selector-indicator {
     position: absolute;
     top: 0;
     bottom: 0;
-    width: 33.33%;
     background-color: #3498db;
     border-radius: 8px;
     transition: transform 0.3s ease, width 0.3s ease;

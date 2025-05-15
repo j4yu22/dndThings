@@ -76,33 +76,46 @@ function updatePageWidths() {
     });
 }
 
-
 function updateSelector() {
     const visiblePages = getVisiblePageCount();
-    const percentPerTab = 100 / 3; // 3 tabs
-    const visibleSpan = (visiblePages / 3) * 100;
-    const maxPage = 3 - visiblePages;
+    const indicator = selector;
+    const selectorBar = document.querySelector('.page-selector');
+    const totalWidth = selectorBar.offsetWidth;
 
-    const clampedPage = Math.min(currentPage, maxPage); // avoid sliding beyond edge
-    const offset = clampedPage * percentPerTab;
+    const tabWidth = totalWidth / 3;
 
-    selector.style.width = `${visibleSpan}%`;
-    selector.style.transform = `translateX(${offset}%)`;
+    if (visiblePages === 3) {
+        // Fill the entire bar and reset position
+        indicator.style.width = `${totalWidth}px`;
+        indicator.style.transform = `translateX(0px)`;
+    } else if (visiblePages === 2) {
+        indicator.style.width = `${tabWidth * 2}px`;
+        indicator.style.transform = `translateX(${currentPage >= 1 ? tabWidth : 0}px)`;
+    } else {
+        indicator.style.width = `${tabWidth}px`;
+        indicator.style.transform = `translateX(${tabWidth * currentPage}px)`;
+    }
 }
+
 
 function scrollToPage(index) {
     const visiblePages = getVisiblePageCount();
-    const maxPage = 3 - visiblePages;
-    currentPage = Math.max(0, Math.min(index, maxPage));
+
+    // For 2-page layout, only allow index 0 or 1 (left or right chunk)
+    if (visiblePages === 2) {
+        currentPage = index === 0 ? 0 : 1;
+    } else {
+        currentPage = Math.max(0, Math.min(index, 2));
+    }
 
     const pageWidth = pagesWrapper.offsetWidth / visiblePages;
     pagesWrapper.scrollTo({
         left: currentPage * pageWidth,
         behavior: 'smooth'
     });
+
     updateSelector();
 }
-
 
 options.forEach(option => {
     option.addEventListener('click', () => {
@@ -111,16 +124,6 @@ options.forEach(option => {
     });
 });
 
-pagesWrapper.addEventListener('scroll', () => {
-    const visiblePages = getVisiblePageCount();
-    const pageWidth = pagesWrapper.offsetWidth / visiblePages;
-    const scrollLeft = pagesWrapper.scrollLeft;
-    const newPage = Math.round(scrollLeft / pageWidth);
-    if (newPage !== currentPage) {
-        currentPage = newPage;
-        updateSelector();
-    }
-});
 
 window.addEventListener('resize', () => {
     updatePageWidths();
