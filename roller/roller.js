@@ -1,56 +1,36 @@
 const diceTypes = ['d4', 'd6', 'd8', 'd10', 'd12', 'd20'];
 const counts = {
-    d4: 0,
-    d6: 0,
-    d8: 0,
-    d10: 0,
-    d12: 0,
-    d20: 0
+    d4: 0, d6: 0, d8: 0, d10: 0, d12: 0, d20: 0, custom: 0
 };
 
 const inputBox = document.getElementById('inputBox');
+const customModInput = document.getElementById("custom-modifier");
+const customSidesInput = document.getElementById("custom-sides");
 
 function updateInputBox() {
     const parts = [];
-
-    // Standard dice
     for (const die of diceTypes) {
-        const count = counts[die];
-        if (count > 0) {
-            parts.push(`${count}d${die.slice(1)}`);
+        if (counts[die] > 0) {
+            parts.push(`${counts[die]}d${die.slice(1)}`);
         }
     }
 
     // Custom die
-    if (counts["custom"] > 0) {
+    if (counts.custom > 0) {
         const sides = parseInt(customSidesInput.value);
         if (!isNaN(sides) && sides > 0) {
-            parts.push(`${counts["custom"]}d${sides}`);
+            parts.push(`${counts.custom}d${sides}`);
         }
+    }
+
+    // Modifier
+    const mod = parseInt(customModInput.value);
+    if (!isNaN(mod) && mod !== 0) {
+        parts.push(mod > 0 ? `${mod}` : `${mod}`);
     }
 
     inputBox.textContent = parts.length > 0 ? parts.join(' + ') : 'Click a die to begin';
 }
-
-diceTypes.forEach(die => {
-    const button = document.getElementById(die);
-    const counter = document.getElementById(`${die}-count`);
-
-    button.addEventListener('click', () => {
-        counts[die]++;
-        counter.textContent = counts[die];
-        updateInputBox();
-    });
-
-    button.addEventListener('contextmenu', (e) => {
-        e.preventDefault();
-        if (counts[die] > 0) {
-            counts[die]--;
-            counter.textContent = counts[die];
-            updateInputBox();
-        }
-    });
-});
 
 // Toggle modifier buttons
 document.querySelectorAll('.modifier-button').forEach(button => {
@@ -177,7 +157,6 @@ counts["custom"] = 0;
 // Get DOM elements
 const customButton = document.getElementById("custom");
 const customCounter = document.getElementById("custom-count");
-const customSidesInput = document.getElementById("custom-sides");
 const customLabel = document.getElementById("custom-label");
 
 // Handle left-click to increment count
@@ -208,10 +187,63 @@ customSidesInput.addEventListener("input", () => {
     updateInputBox();
 });
 
-//DICE ROLL LOGIC
-const rollButton = document.getElementById("rollButton");
+let hoveredDie = null;
+let typedInput = "";
+let inputTimeout = null;
 
-rollButton.addEventListener("click", () => {
-    // Placeholder: log or display roll results
-    console.log("Rolling dice...");
+diceTypes.forEach(die => {
+    const button = document.getElementById(die);
+    const counter = document.getElementById(`${die}-count`);
+
+    button.addEventListener('mouseenter', () => {
+        hoveredDie = die;
+        typedInput = "";
+    });
+
+    button.addEventListener('mouseleave', () => {
+        if (typedInput !== "") {
+            const value = parseInt(typedInput, 10);
+            if (!isNaN(value)) {
+                counts[hoveredDie] = value;
+                document.getElementById(`${hoveredDie}-count`).textContent = value;
+                updateInputBox();
+            }
+        }
+        hoveredDie = null;
+        typedInput = "";
+    });
+
+    button.addEventListener('click', () => {
+        if (typedInput === "") {
+            counts[die]++;
+            counter.textContent = counts[die];
+            updateInputBox();
+        }
+        typedInput = ""; // reset so next interaction is clean
+    });
+
+    button.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        if (typedInput === "" && counts[die] > 0) {
+            counts[die]--;
+            counter.textContent = counts[die];
+            updateInputBox();
+        }
+        typedInput = ""; // also reset here
+    });
+
 });
+
+document.addEventListener('keydown', (e) => {
+    if (hoveredDie && /^[0-9]$/.test(e.key)) {
+        typedInput += e.key;
+
+        // Optional: clear if user pauses typing too long (2 sec)
+        clearTimeout(inputTimeout);
+        inputTimeout = setTimeout(() => {
+            typedInput = "";
+        }, 2000);
+    }
+});
+
+customModInput.addEventListener("input", updateInputBox);
