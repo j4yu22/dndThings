@@ -1,75 +1,74 @@
-// Modifier Definitions
-export const MODIFIERS = [
-  {
-    type: "d20",
-    id: "advantage",
-    name: "Advantage",
-    description: "You can reroll a d20 Test and use the higher result."
+const modifiers = {
+  'Advantage': {
+    abreviation: "adv",
+    limited_to: ["d20"],
+    mutually_exclusive: ['Disadvantage', ],
+    description: "You can reroll a d20 Test and use the higher result.",
   },
-  {
-    type: "d20",
-    id: "disadvantage",
-    name: "Disadvantage",
-    description: "You can reroll a d20 Test and use the lower result."
+  'Disadvantage': {
+    abreviation: "disadv",
+    limited_to: ["d20"],
+    mutually_exclusive: [],
+    description: "You can reroll a d20 Test and use the lower result.",
   },
-  {
-    type: "d20",
-    id: "elven",
-    name: "Advantage: Elven Accuracy",
-    description: "If you already have advantage on a d20 attack roll using DEX, INT, WIS, or CHA, reroll one of the dice once."
+  'Advantage: Elven Accuracy': {
+    abreviation: "elven",
+    limited_to: ["d20"],
+    mutually_exclusive: [],
+    description: "Whenever you have advantage on an attack roll using Dexterity, Intelligence, Wisdom, or Charisma, you can reroll one of the dice once.",
   },
-  {
-    type: "spell",
-    id: "healer",
-    name: "Healer",
-    description: "When you roll HP restoration dice, reroll any 1s."
+  'Healer': {
+    abreviation: "healer",
+    limited_to: [],
+    mutually_exclusive: [],
+    description: "Whenever you roll a die to determine the number of Hit Points you restore with a spell or with this feat’s Battle Medic benefit, you can reroll the die if it rolls a 1, and you must use the new roll.",
   },
-  {
-    type: "weapon",
-    id: "savage",
-    name: "Savage Attacker",
-    description: "Once per turn when you hit, roll weapon damage twice and use either."
+  "Savage Attacker": {
+    abreviation: "savage",
+    limited_to: [],
+    mutually_exclusive: [],
+    description: "Once per turn when you hit a target with a weapon, you can roll the weapon’s damage dice twice and use either roll against the target.",
   },
-  {
-    type: "weapon",
-    id: "tavern",
-    name: "Tavern Brawler",
-    description: "On Unarmed Strike damage, reroll 1s."
+  "Tavern Brawler": {
+    abreviation: "tavern",
+    limited_to: [],
+    mutually_exclusive: [],
+    description: "Whenever you roll a damage die for your Unarmed Strike, you can reroll the die if it rolls a 1, and you must use the new roll.",
   },
-  {
-    type: "spell",
-    id: "elemental",
-    name: "Elemental Adept",
-    description: "Spells of chosen type treat 1s as 2s; ignore resistance."
+  "Elemental Adept": {
+    abreviation: "elemental",
+    limited_to: [],
+    mutually_exclusive: [],
+    description: "Spells you cast ignore Resistance to a chosen element. When you roll damage for a spell of that type, you can treat any 1 as a 2.",
   },
-  {
-    type: "weapon",
-    id: "piercer",
-    name: "Piercer",
-    description: "On piercing damage, reroll one die and use new value."
+  'Piercer': {
+    abreviation: "piercer",
+    limited_to: [],
+    mutually_exclusive: [],
+    description: "Once per turn, when you hit a creature with an attack that deals Piercing damage, you can reroll one of the attack’s damage dice, and you must use the new roll.",
   },
-  {
-    type: "weapon",
-    id: "gwm",
-    name: "Great Weapon Fighting",
-    description: "Melee weapon damage rolls of 1 or 2 are treated as 3."
+  "Great Weapon Fighting": {
+    abreviation: "gwm",
+    limited_to: [],
+    mutually_exclusive: [],
+    description: "When you roll damage with a two-handed melee weapon, treat 1s and 2s as 3s.",
   },
-  {
-    type: "d20",
-    id: "dragon",
-    name: "Starry Form: Dragon",
-    description: "On INT/WIS check or CON save, treat 9 or lower as 10."
+  "Starry Form: Dragon": {
+    abreviation: "dragon",
+    limited_to: ["d20"],
+    mutually_exclusive: [],
+    description: "When you make an INT/WIS check or CON save to maintain Concentration, treat a roll of 9 or lower on the d20 as a 10.",
   },
-  {
-    type: "d20",
-    id: "reliable",
-    name: "Reliable Talent",
-    description: "For skill/tool checks, treat d20 rolls of 9 or lower as 10."
+  "Reliable Talent": {
+    abreviation: "reliable",
+    limited_to: ["d20"],
+    mutually_exclusive: [],
+    description: "Whenever you make an ability check using a skill/tool you're proficient in, treat a d20 roll of 9 or lower as a 10.",
   },
-  {
-    type: "d20",
-    id: "trance",
-    name: "Trance of Order",
-    description: "No one gets advantage against you; your d20 rolls of 9 or lower are treated as 10."
+  "Trance of Order": {
+    abreviation: "trance",
+    limited_to: ["d20"],
+    mutually_exclusive: [],
+    description: "Attack rolls against you can’t benefit from Advantage. When you make a d20 Test, treat rolls of 9 or lower as 10.",
   }
-];
+};

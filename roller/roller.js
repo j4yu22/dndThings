@@ -54,6 +54,7 @@ function getVisiblePageCount() {
     if (width >= 1000) return 2;
     return 1;
 }
+
 function updatePageWidths() {
     const visiblePages = getVisiblePageCount();
     const pages = document.querySelectorAll('.page');
@@ -247,3 +248,26 @@ document.addEventListener('keydown', (e) => {
 });
 
 customModInput.addEventListener("input", updateInputBox);
+
+document.getElementById('clearButton').addEventListener('click', () => {
+    // Reset all counts
+    for (const die of diceTypes) {
+        counts[die] = 0;
+        document.getElementById(`${die}-count`).textContent = 0;
+    }
+
+    // Reset custom die count
+    counts["custom"] = 0;
+    document.getElementById("custom-count").textContent = 0;
+
+    // Clear input fields
+    customSidesInput.value = "";
+    document.getElementById("custom-label").textContent = "?";
+    customModInput.value = "";
+
+    // Deactivate modifiers
+    document.querySelectorAll('.modifier-button.active').forEach(btn => btn.classList.remove('active'));
+
+    // Update text box
+    updateInputBox();
+});
