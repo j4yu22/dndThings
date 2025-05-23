@@ -431,3 +431,13 @@ diceTypes.concat("custom").forEach(die => {
         }
     });
 });
+
+const resetModifiersButton = document.getElementById("resetModifiersButton");
+
+resetModifiersButton.addEventListener("click", () => {
+    activeModifiers.clear();
+    document.querySelectorAll(".modifier-button").forEach(btn => {
+        btn.classList.remove("active");
+    });
+    updateInputBox();
+});

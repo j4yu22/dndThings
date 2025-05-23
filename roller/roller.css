@@ -368,3 +368,33 @@ body {
 #clearButton:hover {
     background-color: #e0e0e0;
 }
+
+.modifiers-header {
+    display: flex;
+    align-items: center;     
+    justify-content: flex-start;
+    gap: 12px;             
+    margin-bottom: 10px;
+}
+
+.reset-button {
+    background-color: #ffffff;
+    color: #111;
+    font-weight: bold;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.reset-button:hover {
+    background-color: #dddddd;
+}
+
+.modifiers-header h2 {
+    margin: 0;
+    line-height: 1; /* Ensures it aligns with button */
+    font-size: 1.3em;
+}
