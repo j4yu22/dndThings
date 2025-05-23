@@ -7,6 +7,14 @@ const inputBox = document.getElementById('inputBox');
 const customModInput = document.getElementById("custom-modifier");
 const customSidesInput = document.getElementById("custom-sides");
 const rollEntries = [];
+const sides = parseInt(customSidesInput.value);
+
+function getCurrentModifiersForDie(dieType) {
+    return Array.from(activeModifiers).filter(mod => {
+        const modData = modifiers[mod];
+        return modData && (modData.limited_to.length === 0 || modData.limited_to.includes(dieType));
+    });
+}
 
 function updateInputBox() {
     const grouped = {};
@@ -34,6 +42,11 @@ function updateInputBox() {
 
         return `${group.count}d${group.sides}${modIcons ? `[${modIcons}]` : ""}`;
     });
+
+    const mod = parseInt(customModInput.value);
+    if (!isNaN(mod) && mod !== 0) {
+        parts.push(`${mod}`);
+    }
 
     inputBox.textContent = parts.length > 0 ? parts.join(" + ") : "Click a die to begin";
 }
@@ -178,18 +191,30 @@ const customLabel = document.getElementById("custom-label");
 
 // Handle left-click to increment count
 customButton.addEventListener("click", () => {
+    const sides = parseInt(customSidesInput.value);
+    if (isNaN(sides) || sides <= 0) return;
+
     counts["custom"]++;
     customCounter.textContent = counts["custom"];
+    rollEntries.push({
+        die: sides,
+        modifiers: getCurrentModifiersForDie("custom")
+    });
     updateInputBox();
 });
 
 // Handle right-click to decrement count
 customButton.addEventListener("contextmenu", (e) => {
     e.preventDefault();
-    if (counts["custom"] > 0) {
-        counts["custom"]--;
-        customCounter.textContent = counts["custom"];
-        updateInputBox();
+    const sides = parseInt(customSidesInput.value);
+    if (counts["custom"] > 0 && !isNaN(sides)) {
+        const index = rollEntries.findIndex(r => r.die === sides && r.type === "custom");
+        if (index !== -1) {
+            rollEntries.splice(index, 1);
+            counts["custom"]--;
+            customCounter.textContent = counts["custom"];
+            updateInputBox();
+        }
     }
 });
 
@@ -198,18 +223,74 @@ customSidesInput.addEventListener("input", () => {
     const sides = parseInt(customSidesInput.value);
     customLabel.textContent = (!isNaN(sides) && sides > 0) ? sides : "?";
 
-    rollEntries = rollEntries.filter(entry => entry.type !== "custom");
+    // Remove previous custom entries
+    for (let i = rollEntries.length - 1; i >= 0; i--) {
+        if (rollEntries[i].type === "custom") {
+            rollEntries.splice(i, 1);
+        }
+    }
 
+    // Re-add entries with new sides if valid
     if (counts.custom > 0 && !isNaN(sides) && sides > 0) {
-        rollEntries.push({
-            type: "custom",
-            count: counts.custom,
-            sides: sides,
-            modifiers: getCurrentModifiersForDie("custom")
-        });
+        for (let i = 0; i < counts.custom; i++) {
+            rollEntries.push({
+                type: "custom",
+                die: sides,
+                modifiers: getCurrentModifiersForDie("custom")
+            });
+        }
     }
 
     updateInputBox();
+});
+
+// Hover typing and context menu for custom die
+const customDieButton = document.getElementById("custom");
+customDieButton.addEventListener('mouseenter', () => {
+    hoveredDie = "custom";
+    typedInput = "";
+});
+
+customDieButton.addEventListener('mouseleave', () => {
+    if (typedInput !== "") {
+        const value = parseInt(typedInput, 10);
+        if (!isNaN(value)) {
+            counts["custom"] = value;
+            customCounter.textContent = value;
+
+            // Remove old entries
+            rollEntries = rollEntries.filter(entry => entry.type !== "custom");
+
+            const sides = parseInt(customSidesInput.value);
+            if (!isNaN(sides) && sides > 0) {
+                for (let i = 0; i < value; i++) {
+                    rollEntries.push({
+                        type: "custom",
+                        die: sides,
+                        modifiers: getCurrentModifiersForDie("custom")
+                    });
+                }
+            }
+            updateInputBox();
+        }
+    }
+
+    hoveredDie = null;
+    typedInput = "";
+});
+
+customDieButton.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    if (counts.custom > 0) {
+        counts.custom--;
+        customCounter.textContent = counts.custom;
+
+        // Remove one custom entry
+        const index = rollEntries.findIndex(r => r.type === "custom");
+        if (index !== -1) rollEntries.splice(index, 1);
+
+        updateInputBox();
+    }
 });
 
 let hoveredDie = null;
@@ -242,7 +323,7 @@ clearButton.addEventListener("click", () => {
         const counter = document.getElementById(`${die}-count`);
         if (counter) counter.textContent = "0";
     }
-
+    customModInput.value = "";
     updateInputBox();
 });
 
@@ -280,20 +361,57 @@ function toggleModifier(modName) {
     updateInputBox();
 }
 
-diceTypes.forEach(die => {
+diceTypes.concat("custom").forEach(die => {
     const button = document.getElementById(die);
     const counter = document.getElementById(`${die}-count`);
 
+    button.addEventListener('mouseenter', () => {
+        hoveredDie = die;
+        typedInput = "";
+    });
+
+    button.addEventListener('mouseleave', () => {
+        if (typedInput !== "") {
+            const value = parseInt(typedInput, 10);
+            if (!isNaN(value)) {
+                counts[hoveredDie] = value;
+
+                // Remove previous entries for this die type
+                for (let i = rollEntries.length - 1; i >= 0; i--) {
+                    if ((hoveredDie === "custom" && rollEntries[i].type === "custom") ||
+                        (rollEntries[i].type === "standard" && `d${rollEntries[i].die}` === hoveredDie)) {
+                        rollEntries.splice(i, 1);
+                    }
+                }
+
+                // Push new entries with current modifiers
+                const dieValue = hoveredDie === "custom" ? parseInt(customSidesInput.value) : parseInt(hoveredDie.slice(1));
+                for (let i = 0; i < value; i++) {
+                    rollEntries.push({
+                        type: hoveredDie === "custom" ? "custom" : "standard",
+                        die: dieValue,
+                        modifiers: getCurrentModifiersForDie(hoveredDie)
+                    });
+                }
+
+                document.getElementById(`${hoveredDie}-count`).textContent = value;
+                updateInputBox();
+            }
+        }
+        hoveredDie = null;
+        typedInput = "";
+    });
+
     button.addEventListener('click', () => {
-        // Determine sides
-        const sides = parseInt(die.slice(1));
-        // Get active modifiers at time of click that apply to this die
-        const mods = Array.from(activeModifiers).filter(mod => {
-            const m = modifiers[mod];
-            return m && (m.limited_to.length === 0 || m.limited_to.includes(die));
+        const sides = die === "custom" ? parseInt(customSidesInput.value) : parseInt(die.slice(1));
+        if (isNaN(sides)) return;
+
+        rollEntries.push({
+            type: die === "custom" ? "custom" : "standard",
+            die: sides,
+            modifiers: getCurrentModifiersForDie(die)
         });
 
-        rollEntries.push({ die: sides, modifiers: mods });
         counts[die]++;
         counter.textContent = counts[die];
         updateInputBox();
@@ -301,11 +419,13 @@ diceTypes.forEach(die => {
 
     button.addEventListener('contextmenu', (e) => {
         e.preventDefault();
-        const sides = parseInt(die.slice(1));
-        const index = rollEntries.findIndex(r => r.die === sides);
+        const sides = die === "custom" ? parseInt(customSidesInput.value) : parseInt(die.slice(1));
+        const type = die === "custom" ? "custom" : "standard";
+        const index = rollEntries.findIndex(r => r.die === sides && r.type === type);
+
         if (counts[die] > 0 && index !== -1) {
-            counts[die]--;
             rollEntries.splice(index, 1);
+            counts[die]--;
             counter.textContent = counts[die];
             updateInputBox();
         }
