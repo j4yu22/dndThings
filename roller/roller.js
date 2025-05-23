@@ -9,33 +9,77 @@ const customSidesInput = document.getElementById("custom-sides");
 
 function updateInputBox() {
     const parts = [];
-    for (const die of diceTypes) {
-        if (counts[die] > 0) {
-            parts.push(`${counts[die]}d${die.slice(1)}`);
+
+    const grouped = {};
+
+    // Build a list of currently active modifiers
+    const active = Array.from(activeModifiers);
+
+    // Group each die count with applicable modifiers
+    for (const die of [...diceTypes, "custom"]) {
+        const count = counts[die];
+        if (count <= 0) continue;
+
+        let sides = die.slice(1);
+        if (die === "custom") {
+            const val = parseInt(customSidesInput.value);
+            if (isNaN(val) || val <= 0) continue;
+            sides = val;
         }
+
+        // Find applicable modifiers
+        const modIcons = active
+            .filter(modName => {
+                const mod = modifiers[modName];
+                return mod && (mod.limited_to.length === 0 || mod.limited_to.includes(die));
+            })
+            .map(modName => modifiers[modName].symbol);
+
+        const key = `${sides}_${modIcons.join("")}`;
+
+        if (!grouped[key]) {
+            grouped[key] = {
+                count: 0,
+                sides,
+                modifiers: modIcons
+            };
+        }
+
+        grouped[key].count += count;
     }
 
-    // Custom die
-    if (counts.custom > 0) {
-        const sides = parseInt(customSidesInput.value);
-        if (!isNaN(sides) && sides > 0) {
-            parts.push(`${counts.custom}d${sides}`);
-        }
+    // Convert grouped results into display text
+    for (const key in grouped) {
+        const group = grouped[key];
+        const diceStr = `${group.count}d${group.sides}`;
+        const modStr = group.modifiers.map(sym => `[${sym}]`).join("");
+        parts.push(`${diceStr}${modStr}`);
     }
 
-    // Modifier
+    // Add custom flat modifier (e.g. +2 or -1)
     const mod = parseInt(customModInput.value);
     if (!isNaN(mod) && mod !== 0) {
-        parts.push(mod > 0 ? `${mod}` : `${mod}`);
+        parts.push(mod > 0 ? `+${mod}` : `${mod}`);
     }
 
-    inputBox.textContent = parts.length > 0 ? parts.join(' + ') : 'Click a die to begin';
+    inputBox.textContent = parts.length > 0 ? parts.join(" + ") : "Click a die to begin";
 }
 
-// Toggle modifier buttons
+
+// event listener
 document.querySelectorAll('.modifier-button').forEach(button => {
+    const modName = button.dataset.mod;
+
+    if (!modifiers[modName]) {
+        console.warn(`Modifier not found: "${modName}"`);
+        return;
+    }
+
+    // Store the name for later use
+    button.dataset.mod = modName;
+
     button.addEventListener('click', () => {
-        button.classList.toggle('active');
+        toggleModifier(modName);
     });
 });
 
@@ -271,3 +315,37 @@ document.getElementById('clearButton').addEventListener('click', () => {
     // Update text box
     updateInputBox();
 });
+
+const activeModifiers = new Set();
+
+function toggleModifier(modName) {
+    const modifierData = modifiers[modName];
+    if (!modifierData) {
+        console.warn(`Modifier not found: "${modName}"`);
+        return;
+    }
+
+    const button = document.querySelector(`.modifier-button[data-mod="${modName}"]`);
+    const isActive = activeModifiers.has(modName);
+
+    if (isActive) {
+        activeModifiers.delete(modName);
+        button.classList.remove("active");
+    } else {
+        // Disable mutually exclusive modifiers
+        modifierData.mutually_exclusive.forEach(conflict => {
+            if (activeModifiers.has(conflict)) {
+                activeModifiers.delete(conflict);
+                const conflictBtn = document.querySelector(`.modifier-button[data-mod="${conflict}"]`);
+                if (conflictBtn) {
+                    conflictBtn.classList.remove("active");
+                }
+            }
+        });
+
+        activeModifiers.add(modName);
+        button.classList.add("active");
+    }
+
+    updateInputBox();
+}
