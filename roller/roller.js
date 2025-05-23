@@ -441,3 +441,5 @@ resetModifiersButton.addEventListener("click", () => {
     });
     updateInputBox();
 });
+
+document.getElementById("rollButton").addEventListener("click", executeFullRoll);
