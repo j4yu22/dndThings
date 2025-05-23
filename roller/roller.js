@@ -6,65 +6,37 @@ const counts = {
 const inputBox = document.getElementById('inputBox');
 const customModInput = document.getElementById("custom-modifier");
 const customSidesInput = document.getElementById("custom-sides");
+const rollEntries = [];
 
 function updateInputBox() {
-    const parts = [];
-
     const grouped = {};
 
-    // Build a list of currently active modifiers
-    const active = Array.from(activeModifiers);
-
-    // Group each die count with applicable modifiers
-    for (const die of [...diceTypes, "custom"]) {
-        const count = counts[die];
-        if (count <= 0) continue;
-
-        let sides = die.slice(1);
-        if (die === "custom") {
-            const val = parseInt(customSidesInput.value);
-            if (isNaN(val) || val <= 0) continue;
-            sides = val;
-        }
-
-        // Find applicable modifiers
-        const modIcons = active
-            .filter(modName => {
-                const mod = modifiers[modName];
-                return mod && (mod.limited_to.length === 0 || mod.limited_to.includes(die));
-            })
-            .map(modName => modifiers[modName].symbol);
-
-        const key = `${sides}_${modIcons.join("")}`;
+    for (const entry of rollEntries) {
+        // Create a unique key for each (die, modifier combo)
+        const key = `${entry.die}_${entry.modifiers.join(",")}`;
 
         if (!grouped[key]) {
             grouped[key] = {
                 count: 0,
-                sides,
-                modifiers: modIcons
+                sides: entry.die,
+                modifiers: entry.modifiers
             };
         }
 
-        grouped[key].count += count;
+        grouped[key].count++;
     }
 
-    // Convert grouped results into display text
-    for (const key in grouped) {
-        const group = grouped[key];
-        const diceStr = `${group.count}d${group.sides}`;
-        const modStr = group.modifiers.map(sym => `[${sym}]`).join("");
-        parts.push(`${diceStr}${modStr}`);
-    }
+    const parts = Object.values(grouped).map(group => {
+        const modIcons = group.modifiers
+            .map(mod => modifiers[mod]?.symbol || "") // use symbol safely
+            .filter(sym => sym !== "")                // remove any blanks
+            .join("");
 
-    // Add custom flat modifier (e.g. +2 or -1)
-    const mod = parseInt(customModInput.value);
-    if (!isNaN(mod) && mod !== 0) {
-        parts.push(mod > 0 ? `+${mod}` : `${mod}`);
-    }
+        return `${group.count}d${group.sides}${modIcons ? `[${modIcons}]` : ""}`;
+    });
 
     inputBox.textContent = parts.length > 0 ? parts.join(" + ") : "Click a die to begin";
 }
-
 
 // event listener
 document.querySelectorAll('.modifier-button').forEach(button => {
@@ -224,60 +196,25 @@ customButton.addEventListener("contextmenu", (e) => {
 // Update the ? label with the number from the input box
 customSidesInput.addEventListener("input", () => {
     const sides = parseInt(customSidesInput.value);
-    if (!isNaN(sides) && sides > 0) {
-        customLabel.textContent = sides;
-    } else {
-        customLabel.textContent = "?";
+    customLabel.textContent = (!isNaN(sides) && sides > 0) ? sides : "?";
+
+    rollEntries = rollEntries.filter(entry => entry.type !== "custom");
+
+    if (counts.custom > 0 && !isNaN(sides) && sides > 0) {
+        rollEntries.push({
+            type: "custom",
+            count: counts.custom,
+            sides: sides,
+            modifiers: getCurrentModifiersForDie("custom")
+        });
     }
+
     updateInputBox();
 });
 
 let hoveredDie = null;
 let typedInput = "";
 let inputTimeout = null;
-
-diceTypes.forEach(die => {
-    const button = document.getElementById(die);
-    const counter = document.getElementById(`${die}-count`);
-
-    button.addEventListener('mouseenter', () => {
-        hoveredDie = die;
-        typedInput = "";
-    });
-
-    button.addEventListener('mouseleave', () => {
-        if (typedInput !== "") {
-            const value = parseInt(typedInput, 10);
-            if (!isNaN(value)) {
-                counts[hoveredDie] = value;
-                document.getElementById(`${hoveredDie}-count`).textContent = value;
-                updateInputBox();
-            }
-        }
-        hoveredDie = null;
-        typedInput = "";
-    });
-
-    button.addEventListener('click', () => {
-        if (typedInput === "") {
-            counts[die]++;
-            counter.textContent = counts[die];
-            updateInputBox();
-        }
-        typedInput = ""; // reset so next interaction is clean
-    });
-
-    button.addEventListener('contextmenu', (e) => {
-        e.preventDefault();
-        if (typedInput === "" && counts[die] > 0) {
-            counts[die]--;
-            counter.textContent = counts[die];
-            updateInputBox();
-        }
-        typedInput = ""; // also reset here
-    });
-
-});
 
 document.addEventListener('keydown', (e) => {
     if (hoveredDie && /^[0-9]$/.test(e.key)) {
@@ -291,28 +228,21 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-customModInput.addEventListener("input", updateInputBox);
+customModInput.addEventListener("input", () => {
+    updateInputBox();
+});
 
-document.getElementById('clearButton').addEventListener('click', () => {
-    // Reset all counts
-    for (const die of diceTypes) {
+const clearButton = document.getElementById("clearButton");
+
+clearButton.addEventListener("click", () => {
+    // Reset all dice counts
+    rollEntries.length = 0;
+    for (const die of [...diceTypes, "custom"]) {
         counts[die] = 0;
-        document.getElementById(`${die}-count`).textContent = 0;
+        const counter = document.getElementById(`${die}-count`);
+        if (counter) counter.textContent = "0";
     }
 
-    // Reset custom die count
-    counts["custom"] = 0;
-    document.getElementById("custom-count").textContent = 0;
-
-    // Clear input fields
-    customSidesInput.value = "";
-    document.getElementById("custom-label").textContent = "?";
-    customModInput.value = "";
-
-    // Deactivate modifiers
-    document.querySelectorAll('.modifier-button.active').forEach(btn => btn.classList.remove('active'));
-
-    // Update text box
     updateInputBox();
 });
 
@@ -349,3 +279,35 @@ function toggleModifier(modName) {
 
     updateInputBox();
 }
+
+diceTypes.forEach(die => {
+    const button = document.getElementById(die);
+    const counter = document.getElementById(`${die}-count`);
+
+    button.addEventListener('click', () => {
+        // Determine sides
+        const sides = parseInt(die.slice(1));
+        // Get active modifiers at time of click that apply to this die
+        const mods = Array.from(activeModifiers).filter(mod => {
+            const m = modifiers[mod];
+            return m && (m.limited_to.length === 0 || m.limited_to.includes(die));
+        });
+
+        rollEntries.push({ die: sides, modifiers: mods });
+        counts[die]++;
+        counter.textContent = counts[die];
+        updateInputBox();
+    });
+
+    button.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        const sides = parseInt(die.slice(1));
+        const index = rollEntries.findIndex(r => r.die === sides);
+        if (counts[die] > 0 && index !== -1) {
+            counts[die]--;
+            rollEntries.splice(index, 1);
+            counter.textContent = counts[die];
+            updateInputBox();
+        }
+    });
+});
