@@ -85,264 +85,217 @@ const modifiers = {
     description: "Attack rolls against you can’t benefit from Advantage. When you make a d20 Test, treat rolls of 9 or lower as 10.",
   }
 };
-/**
- * Rolls a single die with the given number of sides.
- *
- * Parameters:
- *     sides (number): Number of sides on the die
- *
- * Returns:
- *     result (number): Random roll between 1 and sides
- */
-function roll(sides) {
-    if (sides <= 0 || !Number.isInteger(sides)) {
-        throw new Error("Invalid die sides");
-    }
-    return Math.floor(Math.random() * sides) + 1;
-}
-
-/**
- * Rolls a d20 with advantage (roll twice, take higher)
- */
-function advantage(sides) {
-    const a = roll(sides);
-    const b = roll(sides);
-    return Math.max(a, b);
-}
-
-/**
- * Rolls a d20 with disadvantage (roll twice, take lower)
- */
-function disadvantage(sides) {
-    const a = roll(sides);
-    const b = roll(sides);
-    return Math.min(a, b);
-}
-
-/**
- * Elven Accuracy: roll 3 times, take highest
- */
-function elvenAdvantage(sides) {
-    const rolls = [roll(sides), roll(sides), roll(sides)];
-    return Math.max(...rolls);
-}
-
-/**
- * Re-roll all 1s, use new roll
- */
-function rerollOnes(sides, count) {
-    const results = [];
-    for (let i = 0; i < count; i++) {
-        let r = roll(sides);
-        if (r === 1) r = roll(sides);
-        results.push(r);
-    }
-    return results;
-}
-
-/**
- * Savage Attacker: roll twice, use total from higher set
- */
-function savageAttack(sides, count) {
-    const first = Array.from({ length: count }, () => roll(sides));
-    const second = Array.from({ length: count }, () => roll(sides));
-
-    const totalFirst = first.reduce((a, b) => a + b, 0);
-    const totalSecond = second.reduce((a, b) => a + b, 0);
-
-    return totalFirst >= totalSecond ? first : second;
-}
-
-/**
- * Elemental Adept: treat all 1s as 2s
- */
-function elemAdept(sides, count) {
-    return Array.from({ length: count }, () => {
-        const r = roll(sides);
-        return r === 1 ? 2 : r;
-    });
-}
-
-/**
- * Piercer: reroll lowest die once, must use new value
- */
-function piercer(sides, count) {
-    const results = Array.from({ length: count }, () => roll(sides));
-    let lowestIndex = 0;
-    for (let i = 1; i < results.length; i++) {
-        if (results[i] < results[lowestIndex]) {
-            lowestIndex = i;
-        }
-    }
-
-    // Reroll the lowest and replace it
-    results[lowestIndex] = roll(sides);
-    return results;
-}
-
-/**
- * Great Weapon Fighting: treat 1s and 2s as 3s
- */
-function gwf(sides, count) {
-    return Array.from({ length: count }, () => {
-        const r = roll(sides);
-        return r <= 2 ? 3 : r;
-    });
-}
-
-/**
- * Treat any roll under 10 as a 10 (used for Reliable Talent, Starry Form, etc.)
- */
-function tenLow(sides) {
-    const r = roll(sides);
-    return r < 10 ? 10 : r;
-}
-
-/**
- * Parses the dice input text and returns structured dice clusters.
- *
- * Returns:
- *     clusters (Array): Array of objects with shape:
- *         {
- *           count (number): number of dice
- *           sides (number): number of sides
- *           modifiers (Array of strings): symbols of applied modifiers
- *         }
- */
-function parseDiceInputBox() {
-    const rawText = inputBox.textContent.trim();
-    const clusters = [];
-
-    // Skip empty or placeholder
-    if (!rawText || rawText === "Click a die to begin") {
-        return clusters;
-    }
-
-    // Separate by + signs
-    const parts = rawText.split(/\s*\+\s*/);
-
-    for (const part of parts) {
-        // Match clusters like "2d6[⚔][🔨]"
-        const match = part.match(/^(\d+)d(\d+)((?:\[[^\]]+\])*)$/);
-
-        if (match) {
-            const [, countStr, sidesStr, modBlock] = match;
-            const count = parseInt(countStr, 10);
-            const sides = parseInt(sidesStr, 10);
-
-            // Extract all modifier symbols within brackets
-            const modifiers = [];
-            const symbolMatches = [...modBlock.matchAll(/\[([^\]]+)\]/g)];
-            for (const m of symbolMatches) {
-                const group = m[1];
-                for (const char of group) {
-                    modifiers.push(char);
-                }
-            }
-
-            clusters.push({ count, sides, modifiers });
-        } else {
-            // Assume it's a standalone modifier like "+5"
-            const mod = parseInt(part, 10);
-            if (!isNaN(mod)) {
-                clusters.push({ type: "modifier", value: mod });
-            }
-        }
-    }
-
-    return clusters;
-}
 
 const symbolToModifier = {};
-for (const [name, data] of Object.entries(modifiers)) {
-    symbolToModifier[data.symbol] = name;
+for (const [modName, data] of Object.entries(modifiers)) {
+  symbolToModifier[data.symbol] = modName;
+}
+
+// ----------------------
+// UTILITY ROLL FUNCTION
+// ----------------------
+function roll(sides) {
+  return Math.floor(Math.random() * sides) + 1;
+}
+
+// ----------------------
+// FORMULA + CLUSTERING
+// ----------------------
+function getFormulaText(rollEntries) {
+  const grouped = {};
+  for (const entry of rollEntries) {
+    const key = `${entry.die}_${entry.modifiers.join(",")}`;
+    if (!grouped[key]) {
+      grouped[key] = { count: 0, die: entry.die, modifiers: entry.modifiers };
+    }
+    grouped[key].count++;
+  }
+
+  return Object.values(grouped).map(group => {
+    const modIcons = group.modifiers.map(mod => modifiers[mod].symbol).join("");
+    return `${group.count}d${group.die}${modIcons ? `[${modIcons}]` : ""}`;
+  }).join(" + ");
+}
+
+function parseClusters(rollEntries) {
+  const clustered = {};
+  for (const entry of rollEntries) {
+    const key = `${entry.die}_${entry.modifiers.join(",")}`;
+    if (!clustered[key]) {
+      clustered[key] = { count: 0, die: entry.die, modifiers: entry.modifiers };
+    }
+    clustered[key].count++;
+  }
+  return Object.values(clustered);
+}
+
+// Modifiers
+function advantage(die) {
+  const a = roll(die);
+  const b = roll(die);
+  const used = Math.max(a, b);
+  const formatted = `[${a === used ? `<b>${a}</b>` : a}|${b === used ? `<b>${b}</b>` : b}]`;
+  return { sum: used, formatted };
+}
+
+function disadvantage(die) {
+  const a = roll(die);
+  const b = roll(die);
+  const used = Math.min(a, b);
+  const formatted = `[${a === used ? `<b>${a}</b>` : a}|${b === used ? `<b>${b}</b>` : b}]`;
+  return { sum: used, formatted };
+}
+
+function elvenAdvantage(die) {
+  const rolls = [roll(die), roll(die), roll(die)];
+  const used = Math.max(...rolls);
+  const formatted = `[${rolls.map(v => v === used ? `<b>${v}</b>` : v).join("|")}]`;
+  return { sum: used, formatted };
+}
+
+function rerollOnes(die) {
+  const r1 = roll(die);
+  if (r1 === 1) {
+    const r2 = roll(die);
+    return { sum: r2, formatted: `[1 > <b>${r2}</b>]` };
+  }
+  return { sum: r1, formatted: `${r1}` };
+}
+
+function savageAttacker(die, count) {
+  const first = Array.from({ length: count }, () => roll(die));
+  const second = Array.from({ length: count }, () => roll(die));
+  const sum1 = first.reduce((a, b) => a + b);
+  const sum2 = second.reduce((a, b) => a + b);
+  const used = sum1 >= sum2 ? first : second;
+  return {
+    sum: used.reduce((a, b) => a + b),
+    formatted: `[${used.map(v => `<b>${v}</b>`).join("+")}]`
+  };
+}
+
+function elemAdept(die) {
+  const r = roll(die);
+  if (r === 1) return { sum: 2, formatted: `[1 > <b>2</b>]` };
+  return { sum: r, formatted: `${r}` };
+}
+
+function piercer(die, count) {
+  const rolls = Array.from({ length: count }, () => roll(die));
+  let lowestIndex = 0;
+
+  for (let i = 1; i < rolls.length; i++) {
+    if (rolls[i] < rolls[lowestIndex]) lowestIndex = i;
+  }
+
+  const old = rolls[lowestIndex];
+  const rerollThreshold = Math.floor(die / 2);  // Reroll if strictly less than this
+
+  let note = "";
+  if (old < rerollThreshold) {
+    const replacement = roll(die);
+    rolls[lowestIndex] = replacement;
+    note = `, was ${old}`;
+  }
+
+  return {
+    sum: rolls.reduce((a, b) => a + b),
+    formatted: `[${rolls.map((v, i) =>
+      i === lowestIndex ? `<b>${v}</b>` : v
+    ).join("+")}${note}]`
+  };
 }
 
 
-/**
- * Safely checks if a modifier symbol exists in a cluster and maps to a given modifier name
- */
-function hasMod(cluster, targetMod) {
-    if (!cluster.modifiers || !Array.isArray(cluster.modifiers)) return false;
-
-    return cluster.modifiers.some(sym => {
-        const name = symbolToModifier[sym];
-        return name === targetMod;
-    });
+function gwf(die) {
+  const r = roll(die);
+  if (r <= 2) return { sum: 3, formatted: `[${r} > <b>3</b>]` };
+  return { sum: r, formatted: `${r}` };
 }
 
-/**
- * Rolls a dice cluster with appropriate modifier logic applied.
- */
-function rollDiceCluster(cluster) {
-    const { count, sides, modifiers } = cluster;
-
-    // ADVANTAGE/DISADVANTAGE/ELVEN
-    if (hasMod(cluster, "Advantage")) {
-        return Array.from({ length: count }, () => advantage(sides)).reduce((a, b) => a + b, 0);
-    }
-    if (hasMod(cluster, "Disadvantage")) {
-        return Array.from({ length: count }, () => disadvantage(sides)).reduce((a, b) => a + b, 0);
-    }
-    if (hasMod(cluster, "Advantage: Elven Accuracy")) {
-        return Array.from({ length: count }, () => elvenAdvantage(sides)).reduce((a, b) => a + b, 0);
-    }
-
-    // ADVANCED ROLLERS (return full sets)
-    if (hasMod(cluster, "Savage Attacker")) {
-        return savageAttack(sides, count).reduce((a, b) => a + b, 0);
-    }
-    if (hasMod(cluster, "Piercer")) {
-        return piercer(sides, count).reduce((a, b) => a + b, 0);
-    }
-
-    // FLAT MODIFIER ALTERING LOGIC
-    let rolls = Array.from({ length: count }, () => roll(sides));
-
-    if (hasMod(cluster, "Healer") || hasMod(cluster, "Tavern Brawler")) {
-        rolls = rerollOnes(sides, count);
-    }
-
-    if (hasMod(cluster, "Elemental Adept")) {
-        rolls = rolls.map(v => v === 1 ? 2 : v);
-    }
-
-    if (hasMod(cluster, "Great Weapon Fighting")) {
-        rolls = rolls.map(v => v <= 2 ? 3 : v);
-    }
-
-    if (
-        hasMod(cluster, "Starry Form: Dragon") ||
-        hasMod(cluster, "Reliable Talent") ||
-        hasMod(cluster, "Trance of Order")
-    ) {
-        rolls = rolls.map(v => v < 10 ? 10 : v);
-    }
-
-    return rolls.reduce((a, b) => a + b, 0);
+function leastTen(die) {
+  const r = roll(die);
+  if (r < 10) return { sum: 10, formatted: `[${r} > <b>10</b>]` };
+  return { sum: r, formatted: `${r}` };
 }
 
-/**
- * Executes the full roll sequence:
- * - Parses the dice input box
- * - Rolls each dice cluster with appropriate modifiers
- * - Sums the results and adds flat modifier
- * - Displays the final total
- */
+// ----------------------
+// SUBTOTAL / MODIFIER LOGIC
+// ----------------------
+function getSubtotal(cluster) {
+  const { count, die, modifiers } = cluster;
+  const sym = (symbol) => cluster.modifiers.includes(symbolToModifier[symbol]);
+
+
+  let results = [];
+  let sum = 0;
+
+  // Whole-cluster modifiers (like Savage Attacker or Piercer)
+  if (sym("⚔")) {
+    const { sum: s, formatted } = savageAttacker(die, count);
+    return { sum: s, text: formatted };
+  }
+
+  if (sym("↣")) {
+    const { sum: s, formatted } = piercer(die, count);
+    return { sum: s, text: formatted };
+  }
+
+  // Individual die rolls with per-die modifiers
+  for (let i = 0; i < count; i++) {
+    let result;
+
+    if (sym("☘")) result = advantage(die);
+    else if (sym("☠")) result = disadvantage(die);
+    else if (sym("🍀")) result = elvenAdvantage(die);
+    else if (sym("♡") || sym("🤜")) result = rerollOnes(die);
+    else if (sym("⚡")) result = elemAdept(die);
+    else if (sym("🔨")) result = gwf(die);
+    else if (sym("🐉") || sym("🗡") || sym("⏱")) result = leastTen(die);
+    else {
+      const r = roll(die);
+      result = { sum: r, formatted: `${r}` };
+    }
+
+    sum += result.sum;
+    results.push(result.formatted);
+  }
+
+  return {
+    sum,
+    text: results.join(" + ")
+  };
+}
+
+// ----------------------
+// RENDER ROLL RESULTS
+// ----------------------
+function renderRollResult(rollEntries) {
+  const clusters = parseClusters(rollEntries);
+  const formula = getFormulaText(rollEntries);
+  const subtotals = [];
+  let total = 0;
+
+  for (const cluster of clusters) {
+    const { sum, text } = getSubtotal(cluster);
+    subtotals.push(text);
+    total += sum;
+  }
+
+  const mod = parseInt(document.getElementById("custom-modifier").value);
+    if (!isNaN(mod) && mod !== 0) {
+    total += mod;
+    subtotals.push(`${mod}`);
+    }
+
+
+  const inputBox = document.getElementById("inputBox");
+  inputBox.innerHTML = `${formula} ➤ ${subtotals.join(" + ")} ➤ ${total}`;
+}
+
+// ----------------------
+// MAIN EXECUTION ENTRY
+// ----------------------
 function executeFullRoll() {
-    const clusters = parseDiceInputBox();  // Get dice + modifier groupings
-    let total = 0;
-
-    for (const cluster of clusters) {
-        total += rollDiceCluster(cluster); // Sum the results of each cluster
-    }
-
-    // Add flat modifier if present
-    const flatMod = parseInt(customModInput.value);
-    if (!isNaN(flatMod)) {
-        total += flatMod;
-    }
-    
-    // Display the result
-    inputBox.textContent = `${total}`;
+  renderRollResult(rollEntries);
 }
