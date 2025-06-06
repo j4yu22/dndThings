@@ -13,6 +13,9 @@
                 <div class="input-box" id="inputBox">Click dice to start rolling...</div>
                 <button id="rollButton">Roll</button>
                 <button id="clearButton">Clear</button>
+                <button id="saveButton" title="Save Current Roll">
+                <img src="images/save.png" alt="Save">
+                </button>
             </div>
             <div class="dice-container">
                 <div class="dice-wrapper">
@@ -82,10 +85,19 @@
                 </div>
             </div>
             <div class="page" id="saved-page">
-                <h2>Saved Rolls</h2>
+            <h2>Saved Rolls</h2>
+            <div class="saved-rolls-wrapper">
+                <div id="savedRolls" class="roll-list"></div>
+            </div>
             </div>
             <div class="page" id="history-page">
-                <h2>Roll History</h2>
+                <div class="history-header">
+                    <h2>Roll History</h2>
+                    <button id="clearHistoryButton" class="reset-button">Clear</button>
+                </div>
+                <div class="roll-history-wrapper">
+                    <div id="rollHistory" class="history-scroll"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -95,5 +107,9 @@
     <script src="logic.js"></script>
     <script src="roller.js"></script>
 </body>
+<div id="savedContextMenu" class="custom-context-menu" style="display:none;">
+  <div id="renameOption" class="context-item">Rename</div>
+  <div id="deleteOption" class="context-item">Delete</div>
+</div>
 
 </html>

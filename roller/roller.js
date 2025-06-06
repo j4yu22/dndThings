@@ -189,35 +189,6 @@ const customButton = document.getElementById("custom");
 const customCounter = document.getElementById("custom-count");
 const customLabel = document.getElementById("custom-label");
 
-// Handle left-click to increment count
-customButton.addEventListener("click", () => {
-    const sides = parseInt(customSidesInput.value);
-    if (isNaN(sides) || sides <= 0) return;
-
-    counts["custom"]++;
-    customCounter.textContent = counts["custom"];
-    rollEntries.push({
-        die: sides,
-        modifiers: getCurrentModifiersForDie("custom")
-    });
-    updateInputBox();
-});
-
-// Handle right-click to decrement count
-customButton.addEventListener("contextmenu", (e) => {
-    e.preventDefault();
-    const sides = parseInt(customSidesInput.value);
-    if (counts["custom"] > 0 && !isNaN(sides)) {
-        const index = rollEntries.findIndex(r => r.die === sides && r.type === "custom");
-        if (index !== -1) {
-            rollEntries.splice(index, 1);
-            counts["custom"]--;
-            customCounter.textContent = counts["custom"];
-            updateInputBox();
-        }
-    }
-});
-
 // Update the ? label with the number from the input box
 customSidesInput.addEventListener("input", () => {
     const sides = parseInt(customSidesInput.value);
@@ -277,20 +248,6 @@ customDieButton.addEventListener('mouseleave', () => {
 
     hoveredDie = null;
     typedInput = "";
-});
-
-customDieButton.addEventListener('contextmenu', (e) => {
-    e.preventDefault();
-    if (counts.custom > 0) {
-        counts.custom--;
-        customCounter.textContent = counts.custom;
-
-        // Remove one custom entry
-        const index = rollEntries.findIndex(r => r.type === "custom");
-        if (index !== -1) rollEntries.splice(index, 1);
-
-        updateInputBox();
-    }
 });
 
 let hoveredDie = null;
@@ -443,3 +400,68 @@ resetModifiersButton.addEventListener("click", () => {
 });
 
 document.getElementById("rollButton").addEventListener("click", executeFullRoll);
+
+document.getElementById("clearHistoryButton").addEventListener("click", () => {
+    const historyBox = document.getElementById("rollHistory");
+    historyBox.innerHTML = "";
+});
+
+/**
+ * Adds a new saved roll to the saved rolls section
+ *
+ * Parameters:
+ *    name (string): The custom label given by the user
+ *    formula (string): The current roll formula text
+ *
+ * Returns:
+ *    None
+ */
+function addSavedRoll(name, fullHtml) {
+  const savedBox = document.getElementById("savedRolls");
+  const entry = document.createElement("div");
+  entry.classList.add("saved-roll-entry");
+
+  const formulaOnly = fullHtml.split("➤")[0].trim();
+
+  entry.innerHTML = `
+    <div class="saved-label">${name}</div>
+    <div class="saved-formula">${formulaOnly}</div>
+  `;
+
+  // LEFT CLICK - Load & Roll
+  entry.addEventListener("click", () => {
+    inputBox.textContent = formulaOnly;
+    rollEntries.length = 0; // clear previous entries
+    updateInputBox();       // re-render text
+    executeFullRoll();      // roll it
+  });
+
+  // RIGHT CLICK - Custom Context Menu
+  entry.addEventListener("contextmenu", (e) => {
+    e.preventDefault();
+
+    const menu = document.getElementById("savedContextMenu");
+    menu.style.left = `${e.pageX}px`;
+    menu.style.top = `${e.pageY}px`;
+    menu.style.display = "block";
+
+    // Store the entry being acted on
+    menu.dataset.targetEntry = JSON.stringify({
+      nameElementSelector: `.saved-label`,
+      entry: entry.outerHTML
+    });
+    menu.currentEntry = entry;
+  });
+
+  savedBox.prepend(entry);
+}
+
+document.getElementById("saveButton").addEventListener("click", () => {
+  const formula = inputBox.textContent;
+  if (!formula || formula === "Click a die to begin") return;
+
+  const name = prompt("Enter a name for this saved roll:");
+  if (name && name.trim() !== "") {
+    addSavedRoll(name.trim(), formula);
+  }
+});

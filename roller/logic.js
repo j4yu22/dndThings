@@ -111,10 +111,17 @@ function getFormulaText(rollEntries) {
     grouped[key].count++;
   }
 
-  return Object.values(grouped).map(group => {
+  const parts = Object.values(grouped).map(group => {
     const modIcons = group.modifiers.map(mod => modifiers[mod].symbol).join("");
     return `${group.count}d${group.die}${modIcons ? `[${modIcons}]` : ""}`;
-  }).join(" + ");
+  });
+
+  const mod = parseInt(document.getElementById("custom-modifier").value);
+  if (!isNaN(mod) && mod !== 0) {
+    parts.push(mod > 0 ? `${mod}` : `${mod}`);
+  }
+
+  return parts.join(" + ");
 }
 
 function parseClusters(rollEntries) {
@@ -266,6 +273,22 @@ function getSubtotal(cluster) {
     text: results.join(" + ")
   };
 }
+/**
+ * Appends a new roll result to the history panel.
+ *
+ * Parameters:
+ *     html (string): HTML-formatted string to insert into the history
+ *
+ * Returns:
+ *     None
+ */
+function addRollToHistory(html) {
+  const historyBox = document.getElementById("rollHistory");
+  const newEntry = document.createElement("div");
+  newEntry.classList.add("roll-entry");
+  newEntry.innerHTML = html;
+  historyBox.prepend(newEntry);
+}
 
 // ----------------------
 // RENDER ROLL RESULTS
@@ -291,6 +314,7 @@ function renderRollResult(rollEntries) {
 
   const inputBox = document.getElementById("inputBox");
   inputBox.innerHTML = `${formula} ➤ ${subtotals.join(" + ")} ➤ ${total}`;
+  addRollToHistory(inputBox.innerHTML);
 }
 
 // ----------------------

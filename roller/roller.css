@@ -398,3 +398,168 @@ body {
     line-height: 1; /* Ensures it aligns with button */
     font-size: 1.3em;
 }
+
+.roll-history-wrapper {
+    width: 100%;
+    max-height: 300px; /* adjust based on design */
+    overflow-y: auto;
+    padding-top: 10px;
+    box-sizing: border-box;
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: #555 #222;
+}
+
+/* Webkit scrollbar */
+.roll-history-wrapper::-webkit-scrollbar {
+    width: 8px;
+}
+
+.roll-history-wrapper::-webkit-scrollbar-thumb {
+    background-color: #555;
+    border-radius: 4px;
+}
+
+.roll-history-wrapper::-webkit-scrollbar-track {
+    background: #222;
+}
+
+#rollHistory {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+}
+
+.roll-entry {
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #333;
+    word-break: break-word;
+}
+
+.history-header {
+    display: flex;
+    align-items: center;     
+    justify-content: flex-start;
+    gap: 12px;             
+    margin-bottom: 10px;
+}
+.history-header h2 {
+    margin: 0;
+    line-height: 1; /* Ensures it aligns with button */
+    font-size: 1.3em;
+}
+.saved-rolls-wrapper {
+    width: 100%;
+    max-height: 300px; /* same as roll history */
+    overflow-y: auto;
+    padding-top: 10px;
+    box-sizing: border-box;
+    scrollbar-width: thin;
+    scrollbar-color: #555 #222;
+}
+
+.saved-rolls-wrapper::-webkit-scrollbar {
+    width: 8px;
+}
+
+.saved-rolls-wrapper::-webkit-scrollbar-thumb {
+    background-color: #555;
+    border-radius: 4px;
+}
+
+.saved-rolls-wrapper::-webkit-scrollbar-track {
+    background: #222;
+}
+
+#savedRolls {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+}
+
+.saved-entry {
+    padding-bottom: 8px;
+    border-bottom: 1px solid #444;
+    word-break: break-word;
+}
+
+#savedRolls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 0;
+  overflow-y: auto;
+}
+
+.saved-entry {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 12px;
+  border-bottom: 1px solid #444;
+  font-family: monospace;
+}
+
+.saved-name {
+  text-align: left;
+  flex-grow: 1;
+}
+
+.saved-formula {
+  text-align: right;
+  white-space: nowrap;
+}
+
+#saveButton {
+  background: none;
+  border: none;
+  padding: 0 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+#saveButton img {
+  height: 100%; /* scale based on button height */
+  object-fit: contain;
+  filter: brightness(0.9);
+  transition: transform 0.2s;
+}
+
+#saveButton:hover img {
+  transform: scale(1.1);
+  filter: brightness(1.2);
+}
+
+#rollButton, #clearButton, #saveButton {
+  height: 50px; /* Or whatever matches your UI best */
+}
+
+.custom-context-menu {
+  position: absolute;
+  background-color: #1f1f1f;
+  border: 1px solid #555;
+  border-radius: 4px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.5);
+  z-index: 9999;
+  width: 120px;
+  font-family: Arial, sans-serif;
+}
+
+.context-item {
+  padding: 8px 12px;
+  color: #fff;
+  cursor: pointer;
+  border-bottom: 1px solid #333;
+}
+
+.context-item:last-child {
+  border-bottom: none;
+}
+
+.context-item:hover {
+  background-color: #333;
+}
