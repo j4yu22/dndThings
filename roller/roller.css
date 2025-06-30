@@ -563,3 +563,11 @@ body {
 .context-item:hover {
   background-color: #333;
 }
+
+.saved-roll-entry {
+  user-select: none;
+}
+
+#deleteOption {
+  color: red;
+}

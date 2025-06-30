@@ -429,12 +429,31 @@ function addSavedRoll(name, fullHtml) {
   `;
 
   // LEFT CLICK - Load & Roll
-  entry.addEventListener("click", () => {
-    inputBox.textContent = formulaOnly;
+    entry.addEventListener("click", () => {
     rollEntries.length = 0; // clear previous entries
-    updateInputBox();       // re-render text
-    executeFullRoll();      // roll it
-  });
+
+    const parts = formulaOnly.split("+").map(p => p.trim());
+    for (const part of parts) {
+        const match = part.match(/^(\d+)d(\d+)(\[(.*)\])?$/);
+        if (match) {
+        const [, count, sides, , symbols] = match;
+        const modifiers = symbols ? symbols.split("").map(s => symbolToModifier[s]).filter(Boolean) : [];
+
+        for (let i = 0; i < parseInt(count); i++) {
+            rollEntries.push({
+            type: "standard",
+            die: parseInt(sides),
+            modifiers
+            });
+        }
+        } else if (!isNaN(parseInt(part))) {
+        document.getElementById("custom-modifier").value = part;
+        }
+    }
+
+    updateInputBox();
+    executeFullRoll();
+    });
 
   // RIGHT CLICK - Custom Context Menu
   entry.addEventListener("contextmenu", (e) => {
@@ -454,6 +473,8 @@ function addSavedRoll(name, fullHtml) {
   });
 
   savedBox.prepend(entry);
+  saveRollsToLocalStorage();
+
 }
 
 document.getElementById("saveButton").addEventListener("click", () => {
@@ -463,5 +484,89 @@ document.getElementById("saveButton").addEventListener("click", () => {
   const name = prompt("Enter a name for this saved roll:");
   if (name && name.trim() !== "") {
     addSavedRoll(name.trim(), formula);
+  }
+});
+
+// ----------------------
+// HANDLE CONTEXT MENU ACTIONS
+// ----------------------
+
+document.getElementById("renameOption").addEventListener("click", () => {
+  const menu = document.getElementById("savedContextMenu");
+  const entry = menu.currentEntry;
+
+  const newName = prompt("Rename this roll:", entry.querySelector(".saved-label").textContent);
+  if (newName && newName.trim()) {
+    entry.querySelector(".saved-label").textContent = newName.trim();
+    saveRollsToLocalStorage();
+  }
+
+  menu.style.display = "none";
+});
+
+
+document.getElementById("deleteOption").addEventListener("click", () => {
+  const menu = document.getElementById("savedContextMenu");
+  const entry = menu.currentEntry;
+
+  if (entry && entry.parentNode) {
+    entry.parentNode.removeChild(entry);
+    saveRollsToLocalStorage();
+  }
+
+  menu.style.display = "none";
+});
+
+function saveRollsToLocalStorage() {
+  const entries = document.querySelectorAll(".saved-roll-entry");
+  const saved = [];
+
+  entries.forEach(entry => {
+    const name = entry.querySelector(".saved-label").textContent;
+    const formula = entry.querySelector(".saved-formula").textContent;
+    saved.push({ name, formula });
+  });
+
+  localStorage.setItem("savedRolls", JSON.stringify(saved));
+}
+
+
+function loadSavedRollsFromLocalStorage() {
+  const saved = JSON.parse(localStorage.getItem("savedRolls") || "[]");
+  saved.forEach(({ name, formula }) => addSavedRoll(name, formula));
+}
+
+// call on load
+window.addEventListener("DOMContentLoaded", loadSavedRollsFromLocalStorage);
+
+// NEW: global click handler to manage the custom context menu
+document.addEventListener("click", (e) => {
+  const menu = document.getElementById("savedContextMenu");
+
+  if (menu.style.display === "block") {
+    const target = e.target;
+
+    // DELETE
+    if (target.id === "contextDelete") {
+      const entry = menu.currentEntry;
+      if (entry) {
+        entry.remove();
+        saveRollsToLocalStorage();
+      }
+    }
+
+    // RENAME
+    if (target.id === "contextRename") {
+      const entry = menu.currentEntry;
+      if (entry) {
+        const newName = prompt("Enter new name:");
+        if (newName && newName.trim() !== "") {
+          entry.querySelector(".saved-label").textContent = newName.trim();
+          saveRollsToLocalStorage();
+        }
+      }
+    }
+
+    menu.style.display = "none"; // Always hide menu
   }
 });
