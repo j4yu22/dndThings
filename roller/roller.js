@@ -570,3 +570,50 @@ document.addEventListener("click", (e) => {
     menu.style.display = "none"; // Always hide menu
   }
 });
+
+function addRollToHistory(text) {
+  const historyBox = document.getElementById("rollHistory");
+  const entry = document.createElement("div");
+  entry.classList.add("roll-history-entry");
+  entry.textContent = text;
+
+  // RIGHT CLICK MENU
+  entry.addEventListener("contextmenu", (e) => {
+    e.preventDefault();
+    const menu = document.getElementById("historyContextMenu");
+    menu.style.left = `${e.pageX}px`;
+    menu.style.top = `${e.pageY}px`;
+    menu.style.display = "block";
+    menu.currentEntry = entry;
+  });
+
+  historyBox.prepend(entry);
+}
+
+document.getElementById("historySaveOption").addEventListener("click", () => {
+  const menu = document.getElementById("historyContextMenu");
+  const entry = menu.currentEntry;
+
+  if (entry) {
+    const formula = entry.textContent;
+    const name = prompt("Name this saved roll:");
+    if (name && name.trim()) {
+      addSavedRoll(name.trim(), formula);
+    }
+  }
+
+  menu.style.display = "none";
+});
+
+document.addEventListener("click", (e) => {
+  const savedMenu = document.getElementById("savedContextMenu");
+  const historyMenu = document.getElementById("historyContextMenu");
+
+  if (savedMenu.style.display === "block") {
+    savedMenu.style.display = "none";
+  }
+
+  if (historyMenu.style.display === "block") {
+    historyMenu.style.display = "none";
+  }
+});
