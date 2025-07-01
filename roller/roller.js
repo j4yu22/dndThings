@@ -575,7 +575,7 @@ function addRollToHistory(text) {
   const historyBox = document.getElementById("rollHistory");
   const entry = document.createElement("div");
   entry.classList.add("roll-history-entry");
-  entry.textContent = text;
+  entry.innerHTML = text;
 
   // RIGHT CLICK MENU
   entry.addEventListener("contextmenu", (e) => {
