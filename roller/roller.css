@@ -6,10 +6,12 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
     margin: 0;
     width: 100%;
     max-width: 100%;
+    min-height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 .roller-wrapper {
@@ -113,7 +115,10 @@ body {
     flex-direction: column;
     align-items: center;
     width: 100%;
+    padding: 20px 0;
+    box-sizing: border-box;
 }
+
 
 .modifiers-grid {
     display: grid;
@@ -267,7 +272,8 @@ body {
     align-items: stretch;       /* stretch both to equal height */
     justify-content: center;
     gap: 20px;
-    margin-bottom: 30px;
+    margin-top: 40px;
+    margin-bottom: 5px;
 }
 
 #rollButton {
