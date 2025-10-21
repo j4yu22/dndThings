@@ -10,8 +10,7 @@ document.getElementById("backButton").addEventListener("click", () => {
 
 // Placeholder for loading/saving characters
 const characters = {
-    ronso: { name: "Ronso", level: 13 },
-    mira: { name: "Mira", level: 7 },
+    ronso: { name: "Placeholder", level: 67 }
 };
 
 // Load existing or new character
@@ -32,3 +31,42 @@ if (isNew) {
     // Invalid / unknown id fallback
     header.textContent = "Character Not Found";
 }
+
+/**
+ * Enables click and hold behavior for proficiency toggles:
+ * - Click: toggles proficiency (filled circle)
+ * - Hold: sets expertise (gold star)
+ */
+function initializeProficiencyToggles() {
+  const circles = document.querySelectorAll('.prof-circle');
+
+  circles.forEach(circle => {
+    let pressTimer;
+
+    // Simple click toggles proficiency
+    circle.addEventListener('click', () => {
+      if (circle.dataset.level === 'none' || circle.dataset.level === 'expert') {
+        circle.dataset.level = 'prof';
+        circle.classList.add('filled');
+        circle.classList.remove('expert');
+      } else {
+        circle.dataset.level = 'none';
+        circle.classList.remove('filled', 'expert');
+      }
+    });
+
+    // Hold for 0.8s → expertise
+    circle.addEventListener('mousedown', () => {
+      pressTimer = setTimeout(() => {
+        circle.dataset.level = 'expert';
+        circle.classList.add('expert');
+        circle.classList.remove('filled');
+      }, 800);
+    });
+
+    circle.addEventListener('mouseup', () => clearTimeout(pressTimer));
+    circle.addEventListener('mouseleave', () => clearTimeout(pressTimer));
+  });
+}
+
+document.addEventListener('DOMContentLoaded', initializeProficiencyToggles);

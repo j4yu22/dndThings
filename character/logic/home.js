@@ -1,7 +1,6 @@
 // Example character data
 const characters = [
-    { id: "ronso", name: "Ronso", level: 13 },
-    { id: "mira", name: "Mira", level: 7 },
+    { id: "ronso", name: "Placeholder", level: 67 }
 ];
 
 // Grab the grid

@@ -11,15 +11,247 @@
         <h1 id="charNameHeader">Character Sheet</h1>
         <button id="backButton">← Back</button>
     </header>
-
     <main>
-        <section id="character-info">
-            <label>Name:</label> <input id="charName" type="text">
-            <label>Level:</label> <input id="charLevel" type="number" min="1">
-            <!-- you’ll expand this later -->
+        <!-- Character Overview Section -->
+        <section id="character-overview">
+            <div class="overview-container">
+                <div class="row">
+                <input type="text" id="char-name" placeholder="character name" class="large-input">
+                <div class="mini-group">
+                    <label for="level">lv</label>
+                    <input type="number" id="level" min="1" max="20">
+                </div>
+                </div>
+
+                <div class="row">
+                <input type="text" id="char-class" placeholder="class(es)">
+                <div class="mini-group">
+                    <label for="xp">xp</label>
+                    <input type="number" id="xp" min="0">
+                </div>
+                </div>
+
+                <div class="row">
+                <input type="text" id="background" placeholder="background">
+                <input type="text" id="species" placeholder="species">
+                </div>
+            </div>
+        </section>
+        <!-- Stats Section -->
+        <section id="stats-section">
+            <div class="stats-container">
+                <!-- First Column -->
+                <div class="abilities">
+                    <div class="ability" data-stat="str">
+                        <h1 class="stat-text">Str</h1>
+                        <span class="modifier">--</span>
+                        <div class="ability-score">
+                            <input type="number" min="1" max="50" value="">
+                        </div>
+                    </div>
+                    <div class="ability" data-stat="dex">
+                        <h1 class="stat-text">Dex</h1>
+                        <span class="modifier">--</span>
+                        <div class="ability-score">
+                            <input type="number" min="1" max="50" value="">
+                        </div>
+                    </div>
+                    <div class="ability" data-stat="con">
+                        <h1 class="stat-text">Con</h1>
+                        <span class="modifier">--</span>
+                        <div class="ability-score">
+                            <input type="number" min="1" max="50" value="">
+                        </div>
+                    </div>
+                    <div class="ability" data-stat="int">
+                        <h1 class="stat-text">Int</h1>
+                        <span class="modifier">--</span>
+                        <div class="ability-score">
+                            <input type="number" min="1" max="50" value="">
+                        </div>
+                    </div>
+                    <div class="ability" data-stat="wis">
+                        <h1 class="stat-text">Wis</h1>
+                        <span class="modifier">--</span>
+                        <div class="ability-score">
+                            <input type="number" min="1" max="50" value="">
+                        </div>
+                    </div>
+                    <div class="ability" data-stat="cha">
+                        <h1 class="stat-text">Cha</h1>
+                        <span class="modifier">--</span>
+                        <div class="ability-score">
+                            <input type="number" min="1" max="50" value="">
+                        </div>
+                    </div>
+                </div>
+                <!-- Second Column -->
+                 <div class="middle-stats">
+                    <div class="info-box">
+                        <p class="info-label">Proficiency Bonus</p>
+                        <span class="info-value" id="proficiency-bonus">--</span>
+                    </div>
+
+                    <div class="saving-throws">
+                        <p class="info-label">Saving Throws</p>
+                        <div class="throw-row" data-stat="str">
+                            <div class="prof-circle" data-level="none"></div>
+                            <span class="throw-mod">--</span>
+                            <span class="throw-name">Strength</span>
+                        </div>
+
+                        <div class="throw-row" data-stat="dex">
+                            <div class="prof-circle" data-level="none"></div>
+                            <span class="throw-mod">--</span>
+                            <span class="throw-name">Dexterity</span>
+                        </div>
+
+                        <div class="throw-row" data-stat="con">
+                            <div class="prof-circle" data-level="none"></div>
+                            <span class="throw-mod">--</span>
+                            <span class="throw-name">Constitution</span>
+                        </div>
+
+                        <div class="throw-row" data-stat="int">
+                            <div class="prof-circle" data-level="none"></div>
+                            <span class="throw-mod">--</span>
+                            <span class="throw-name">Intelligence</span>
+                        </div>
+
+                        <div class="throw-row" data-stat="wis">
+                            <div class="prof-circle" data-level="none"></div>
+                            <span class="throw-mod">--</span>
+                            <span class="throw-name">Wisdom</span>
+                        </div>
+
+                        <div class="throw-row" data-stat="cha">
+                            <div class="prof-circle" data-level="none"></div>
+                            <span class="throw-mod">--</span>
+                            <span class="throw-name">Charisma</span>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <p class="info-label">Passive Perception</p>
+                        <span class="info-value" id="passive-perception">--</span>
+                    </div>
+                </div>
+                <!-- Third Column -->
+                <div class="skills">
+                    <p class="info-label"> Skills</p>
+                    <div class="throw-row" data-skill="acrobatics">
+                        <div class="prof-circle" data-level="none"></div>
+                        <span class="throw-mod">--</span>
+                        <span class="throw-name">Acrobatics</span>
+                    </div>
+                    <div class="throw-row" data-skill="animal-handling">
+                        <div class="prof-circle" data-level="none"></div>
+                        <span class="throw-mod">--</span>
+                        <span class="throw-name">Animal Handling</span>
+                    </div>
+                    <div class="throw-row" data-skill="arcana">
+                        <div class="prof-circle" data-level="none"></div>
+                        <span class="throw-mod">--</span>
+                        <span class="throw-name">Arcana</span>
+                    </div>
+                    <div class="throw-row" data-skill="athletics">
+                        <div class="prof-circle" data-level="none"></div>
+                        <span class="throw-mod">--</span>
+                        <span class="throw-name">Athletics</span>
+                    </div>
+                    <div class="throw-row" data-skill="deception">
+                        <div class="prof-circle" data-level="none"></div>
+                        <span class="throw-mod">--</span>
+                        <span class="throw-name">Deception</span>
+                    </div>
+                    <div class="throw-row" data-skill="history">
+                        <div class="prof-circle" data-level="none"></div>
+                        <span class="throw-mod">--</span>
+                        <span class="throw-name">History</span>
+                    </div>
+                    <div class="throw-row" data-skill="insight">
+                        <div class="prof-circle" data-level="none"></div>
+                        <span class="throw-mod">--</span>
+                        <span class="throw-name">Insight</span>
+                    </div>
+                    <div class="throw-row" data-skill="intimidation">
+                        <div class="prof-circle" data-level="none"></div>
+                        <span class="throw-mod">--</span>
+                        <span class="throw-name">Intimidation</span>
+                    </div>
+                    <div class="throw-row" data-skill="investigation">
+                        <div class="prof-circle" data-level="none"></div>
+                        <span class="throw-mod">--</span>
+                        <span class="throw-name">Investigation</span>
+                    </div>
+                    <div class="throw-row" data-skill="medicine">
+                        <div class="prof-circle" data-level="none"></div>
+                        <span class="throw-mod">--</span>
+                        <span class="throw-name">Medicine</span>
+                    </div>
+                    <div class="throw-row" data-skill="nature">
+                        <div class="prof-circle" data-level="none"></div>
+                        <span class="throw-mod">--</span>
+                        <span class="throw-name">Nature</span>
+                    </div>
+                    <div class="throw-row" data-skill="perception">
+                        <div class="prof-circle" data-level="none"></div>
+                        <span class="throw-mod">--</span>
+                        <span class="throw-name">Perception</span>
+                    </div>
+                    <div class="throw-row" data-skill="performance">
+                        <div class="prof-circle" data-level="none"></div>
+                        <span class="throw-mod">--</span>
+                        <span class="throw-name">Performance</span>
+                    </div>
+
+                    <!-- left of here -->
+                    <div class="throw-row" data-skill="acrobatics">
+                        <div class="prof-circle" data-level="none"></div>
+                        <span class="throw-mod">--</span>
+                        <span class="throw-name">Acrobatics</span>
+                    </div>
+                    <div class="throw-row" data-skill="acrobatics">
+                        <div class="prof-circle" data-level="none"></div>
+                        <span class="throw-mod">--</span>
+                        <span class="throw-name">Acrobatics</span>
+                    </div>
+                    <div class="throw-row" data-skill="acrobatics">
+                        <div class="prof-circle" data-level="none"></div>
+                        <span class="throw-mod">--</span>
+                        <span class="throw-name">Acrobatics</span>
+                    </div>
+                    <div class="throw-row" data-skill="acrobatics">
+                        <div class="prof-circle" data-level="none"></div>
+                        <span class="throw-mod">--</span>
+                        <span class="throw-name">Acrobatics</span>
+                    </div>
+                    <div class="throw-row" data-skill="acrobatics">
+                        <div class="prof-circle" data-level="none"></div>
+                        <span class="throw-mod">--</span>
+                        <span class="throw-name">Acrobatics</span>
+                    </div>
+                    
+                </div>
+
+                </div>
+            </div>
         </section>
     </main>
 
     <script src="logic/character.js"></script>
 </body>
 </html>
+
+<!--
+    Character sheet sections:
+Character overview: name, class, xp, level, species, background
+Stats: str, dex, con, int, wis, cha, PB, saving throws x6, skills x18, pasive wisdom (perception)
+Proficiencies list: armor, weapon, tool, vehicle, other speeds (swim, fly), languages, other proficiencies
+Inventory: Equipped itesm, Money, Flask (small, medium, big), Magic items, other
+Attributes: Character passives, abilities, feats
+Battle Info: Max HP, Current HP, AC, Initiative bonus, Speed, Temp HP, Hit dice, Death saves
+Attack info: user inputed custom attacks, with a preexisting list of preset weapons
+Spellbook: spell save DC, spell atk bonus, constitution save for maintaining concentration, preset to default spellslots + prepared spell availablility based on class / stats, 
+    everything is customizable, can select from existing spellbook based on json or input custom spell
+-->
