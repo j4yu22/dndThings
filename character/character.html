@@ -11,7 +11,7 @@
         <h1 id="charNameHeader">Character Sheet</h1>
         <button id="backButton">← Back</button>
     </header>
-    <main>
+    <main class="character-layout">
         <!-- Character Overview Section -->
         <section id="character-overview">
             <div class="overview-container">
@@ -86,7 +86,7 @@
                     </div>
                 </div>
                 <!-- Second Column -->
-                 <div class="middle-stats">
+                <div class="middle-stats">
                     <div class="info-box">
                         <p class="info-label">Proficiency Bonus</p>
                         <span class="info-value" id="proficiency-bonus">--</span>
@@ -138,7 +138,7 @@
                 </div>
                 <!-- Third Column -->
                 <div class="skills">
-                    <p class="info-label"> Skills</p>
+                    <p class="info-label">Skills</p>
                     <div class="throw-row" data-skill="acrobatics">
                         <div class="prof-circle" data-level="none"></div>
                         <span class="throw-mod">--</span>
@@ -204,36 +204,77 @@
                         <span class="throw-mod">--</span>
                         <span class="throw-name">Performance</span>
                     </div>
-
-                    <!-- left of here -->
-                    <div class="throw-row" data-skill="acrobatics">
+                    <div class="throw-row" data-skill="persuasion">
                         <div class="prof-circle" data-level="none"></div>
                         <span class="throw-mod">--</span>
-                        <span class="throw-name">Acrobatics</span>
+                        <span class="throw-name">Persuasion</span>
                     </div>
-                    <div class="throw-row" data-skill="acrobatics">
+                    <div class="throw-row" data-skill="religion">
                         <div class="prof-circle" data-level="none"></div>
                         <span class="throw-mod">--</span>
-                        <span class="throw-name">Acrobatics</span>
+                        <span class="throw-name">Religion</span>
                     </div>
-                    <div class="throw-row" data-skill="acrobatics">
+                    <div class="throw-row" data-skill="slight-of-hand">
                         <div class="prof-circle" data-level="none"></div>
                         <span class="throw-mod">--</span>
-                        <span class="throw-name">Acrobatics</span>
+                        <span class="throw-name">Slight of Hand</span>
                     </div>
-                    <div class="throw-row" data-skill="acrobatics">
+                    <div class="throw-row" data-skill="stealth">
                         <div class="prof-circle" data-level="none"></div>
                         <span class="throw-mod">--</span>
-                        <span class="throw-name">Acrobatics</span>
+                        <span class="throw-name">Stealth</span>
                     </div>
-                    <div class="throw-row" data-skill="acrobatics">
+                    <div class="throw-row" data-skill="survival">
                         <div class="prof-circle" data-level="none"></div>
                         <span class="throw-mod">--</span>
-                        <span class="throw-name">Acrobatics</span>
+                        <span class="throw-name">Survival</span>
                     </div>
-                    
+                </div>
+            </div>
+        </section>
+        <section id="battle-stats">
+            <div class="battle-container">
+                <div class="ac">
+                <input type="text" class="battle-value" placeholder="--">
+                <p class="battle-label">AC</p>
                 </div>
 
+                <div class="hp">
+                <div class="current-hp">
+                    <input type="text" class="battle-value" placeholder="--">
+                    <p class="battle-label">HP</p>
+                </div>
+                <div class="max-hp">
+                    <input type="text" class="battle-value" placeholder="--">
+                    <p class="battle-label">Max HP</p>
+                </div>
+                </div>
+
+                <div class="speed">
+                <input type="text" class="battle-value" placeholder="--"> <p>ft</p>
+                <p class="battle-label">Speed</p>
+                </div>
+
+                <div class="temp-hp">
+                <input type="text" class="battle-value" placeholder="--">
+                <p class="battle-label">Temp Hp</p>
+                </div>
+
+                <div class="initiative">
+                <input type="text" class="battle-value" placeholder="--">
+                <p class="battle-label">Init</p>
+                </div>
+
+                <div class="hit-dice">
+                <input type="text" class="battle-value" placeholder="--">
+                <p class="battle-label">Hit Dice</p>
+                </div>
+                <div class="death-saves">
+                    <div class="death-grid">
+                        <div class="death-success"></div>
+                        <div class="death-fail"></div>
+                    </div>
+                    <p class="battle-label">Death Saves</p>
                 </div>
             </div>
         </section>

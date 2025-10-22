@@ -2,6 +2,20 @@
 const params = new URLSearchParams(window.location.search);
 const charId = params.get("id");
 const isNew = params.get("new");
+const char = new CharacterStats();
+
+// Whenever an input changes, update the object
+document.querySelectorAll('.ability input').forEach(input => {
+    input.addEventListener('input', e => {
+        const stat = e.target.closest('.ability').dataset.stat;
+        char.updateAbility(stat, parseInt(e.target.value) || 0);
+    });
+});
+
+// On load
+window.addEventListener('DOMContentLoaded', () => {
+    char.updateUI();
+});
 
 // Handle back button
 document.getElementById("backButton").addEventListener("click", () => {
@@ -70,3 +84,7 @@ function initializeProficiencyToggles() {
 }
 
 document.addEventListener('DOMContentLoaded', initializeProficiencyToggles);
+
+document.querySelectorAll('input').forEach(input => {
+  if (!input.value) input.value = '--';
+});
