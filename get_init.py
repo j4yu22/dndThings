@@ -1,5 +1,6 @@
 #https://discord.com/api/oauth2/authorize?client_id=1232759454961766401&permissions=8&scope=bot%20applications.commands
 
+import os
 import discord
 from discord.ext import commands
 import asyncio
@@ -50,4 +51,4 @@ def save_initiatives(initiatives):
         print("Initiatives saved to file.")
 
 
-bot.run('MTIzMjc1OTQ1NDk2MTc2NjQwMQ.GMPBNw.UUXB0C0AW3xbKRxyoF1_XJ7QTDul9Ar30Xdmzc')
+bot.run(os.environ["DISCORD_GET_INIT_TOKEN"])
