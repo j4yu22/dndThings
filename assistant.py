@@ -7,6 +7,8 @@ add ability to calculate saving throws and automatically roll them
 add level - pb dictionary
 """
 
+import os
+
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import tkinter as tk
@@ -106,7 +108,10 @@ def read_initiatives(filename):
 # Access the google sheet and parse the data
 def fetch_data():
     scope = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
-    creds = ServiceAccountCredentials.from_json_keyfile_name('D:\\python\\gitstuff\\dndThings\\dndthings-91b2e9bcd84b.json', scope)
+    credentials_path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
+    if not credentials_path:
+        raise RuntimeError("Set GOOGLE_APPLICATION_CREDENTIALS to a credential file stored outside this repository.")
+    creds = ServiceAccountCredentials.from_json_keyfile_name(credentials_path, scope)
     client = gspread.authorize(creds)
     sheet = client.open_by_key("1fWAHuARSuJ42jQtFhg_KBclv72Gbt2A7skX2L55WeHA").sheet1
     initiatives = read_initiatives('d:\\python\\gitstuff\\dndthings\\initiative.txt')
